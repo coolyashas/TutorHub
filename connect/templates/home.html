@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Welcome, {{ user.username }}!</h2>
+
+  {% if user_profile.type == 'student' %}
+    <h3>Available Sessions:</h3>
+    <ul>
+    {% for session in sessions %}
+      {% if session.subject in user_profile.subjects.all %}
+          <li>
+              {{ session.date_time }} - {{ session.subject.name }}
+              <a href="https://meet.google.com">
+                  <button type="button">Join Session</button>
+              </a>
+          </li>
+      {% endif %}
+    {% endfor %}
+    </ul>
+    <p><a href="{% url 'change_subjects' %}">Change Subjects</a></p>
+
+  {% elif user_profile.type == 'tutor' %}
+    <h3>Your Scheduled Sessions:</h3>
+    <ul>
+      {% for session in sessions %}
+        <li>
+          {{ session.date_time }} - {{ session.subject.name }} - Status: {{ session.status }}
+          <a href="https://meet.google.com">
+            <button type="button">Start Session</button>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+    <p><a href="{% url 'schedule_session' %}">Schedule a Session</a></p>
+  {% endif %}
+
+{% endblock %}

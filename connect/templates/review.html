@@ -1,10 +1,23 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Submit a Review</h2>
-  <form method="post" action="{% url 'review' %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit Review</button>
-  </form>
+    <h2>Submit a Review</h2>
+    <form method="post" action="{% url 'review' session_id %}">
+        {% csrf_token %}
+        
+        {% if user_profile.type == 'student' %}
+            {{ form.tutor_review }}
+            {{ form.tutor_rating }}
+            
+        {% elif user_profile.type == 'tutor' %}
+            <label>
+                Did the student attend the session?
+                <input type="checkbox" name="attended" value="attended">
+            </label>
+            {{ form.student_review }}
+            {{ form.student_rating }}
+        {% endif %}
+        
+        <button type="submit">Submit Review</button>
+    </form>
 {% endblock %}

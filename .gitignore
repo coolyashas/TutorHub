@@ -1,3 +1,9 @@
+.gitignore
+test.py
+TutorHub/__pycache__/
+connect/migrations/
+connect/__pycache__/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

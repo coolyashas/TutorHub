@@ -54,8 +54,6 @@ class UserProfileListViewTest(TestCase):
         response = self.client.get('/connect/review/')
         self.assertEqual(response.status_code, 302)  # Assuming redirection to login page if not authenticated
 
-
-
     def test_register_view_validation_failed(self):
         data = {'username': 'testuser', 'password1': 'testpassword', 'password2': 'wrongpassword', 'type': 'student'}
         response = self.client.post(reverse('register'), data)

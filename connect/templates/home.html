@@ -1,37 +1,77 @@
 {% extends 'base.html' %}
-
 {% block content %}
+
   <h2>Welcome, {{ user.username }}!</h2>
 
   {% if user_profile.type == 'student' %}
     <h3>Available Sessions:</h3>
     <ul>
-    {% for session in sessions %}
-      {% if session.subject in user_profile.subjects.all %}
-          <li>
-              {{ session.date_time }} - {{ session.subject.name }}
-              <a href="https://meet.google.com">
+    {% for session, att in dic.items %}
+    <li>
+        {% if session.status == 'scheduled' and session.date_time > curr %}
+            {{ session.date_time }} - {{ session.subject.name }} {{ session.duration }} - Status: {{ session.status }}
+            <form method="post" action="{% url 'home' %}">
+              {% csrf_token %}
+              <input type="hidden" name="book_session" value="{{ session.id }}"> <!-- includes hidden data that will be included when the form is submitted. -->
+              <button type="submit">Book Session</button>
+            </form>
+        {% endif %}
+        
+        {% if user_profile == att.student %}
+            
+            {% if session.status == 'booked' %}
+            {{ session.date_time }} - {{ session.subject.name }} {{ session.duration }} - Status: {{ session.status }}
+                
+                {% if curr >= session.date_time %}
+                <a href="https://meet.google.com">
                   <button type="button">Join Session</button>
-              </a>
-          </li>
-      {% endif %}
+                </a>
+                {% endif %}
+
+                {% if curr >= session.date_time|add:session.duration %}
+                <a href="{% url 'review' session_id=session.id %}">
+                  <button type="button">Review session</button>
+                </a>
+                {% endif %}
+
+            {% elif session.status == 'missed' or session.status == 'finished' %}
+            {{ session.date_time }} - {{ session.subject.name }} {{ session.duration }} - Status: {{ session.status }}
+            
+            {% endif %}
+
+        {% endif %}
+
+    </li>
     {% endfor %}
     </ul>
-    <p><a href="{% url 'change_subjects' %}">Change Subjects</a></p>
 
-  {% elif user_profile.type == 'tutor' %}
+
+  {% else %}
+  
     <h3>Your Scheduled Sessions:</h3>
     <ul>
-      {% for session in sessions %}
-        <li>
-          {{ session.date_time }} - {{ session.subject.name }} - Status: {{ session.status }}
-          <a href="https://meet.google.com">
-            <button type="button">Start Session</button>
-          </a>
-        </li>
+      {% for session in dic %}
+      <li>
+          {{ session.date_time }} - {{ session.subject.name }} {{ session.duration }} - Status: {{ session.status }}
+          
+          {% if session.status == 'booked' %}
+              
+              {% if curr > session.date_time %}
+              <a href="https://meet.google.com">
+                  <button type="button">Start Session</button>
+              </a>
+              <a href="{% url 'review' session.id %}">
+                <button type="button">Review session</button>
+              </a>
+              {% endif %}
+
+          {% endif %}
+      </li>
       {% endfor %}
     </ul>
-    <p><a href="{% url 'schedule_session' %}">Schedule a Session</a></p>
+    <p><a href="{% url 'create_session' %}">Schedule a Session</a></p>
+
   {% endif %}
 
+  <p><a href="{% url 'change_subjects' %}">Change Subjects</a></p>
 {% endblock %}

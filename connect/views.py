@@ -46,7 +46,7 @@ def user_logout(request):
     return redirect('login')
 
 @login_required
-def home(request): #logic is interesting so go over it
+def home(request):
 
     user_profile = UserProfile.objects.get(user=request.user)
     sessions = Session.objects.filter(
